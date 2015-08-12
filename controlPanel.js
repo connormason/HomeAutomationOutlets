@@ -67,12 +67,9 @@ function generatePanelStructure(panelTitleIn) {
 	return panelBody;
 }
 
-function generateModesPanel(modes) {
-	// Content variables
-	var modeName = modes.val().name;
-
+function generateModesPanel(modesSnapshot) {
 	// Generate panel body 
-	var panelBody = generatePanelStructure("Module " + moduleNum + ": " + moduleName);
+	var panelBody = generatePanelStructure("Modes");
 
 	// Create list group
 	var listGroup = document.createElement("div");
@@ -80,9 +77,13 @@ function generateModesPanel(modes) {
 	panelBody.appendChild(listGroup);
 
 	// Create list items
-	modes.forEach(function(mode) {
+	modesSnapshot.forEach(function(mode) {
 		var listItem = document.createElement("a");
-		var listItemText = document.createTextNode();
+		var listItemText = document.createTextNode(mode.val().name);
+		listItem.className = "list-group-item";
+		listItem.addEventListener("click", function() { selectMode(); })
+		listItem.appendChild(listItemText);
+		listGroup.appendChild(listItem);
 	});
 }
 
@@ -138,4 +139,8 @@ function toggleRelay(moduleNum, buttonNum) {
 		// Update button color
 		document.getElementById("module" + moduleNum + "button" + buttonNum).className = chooseButtonColor(!curVal);
 	});
+}
+
+function selectMode() {
+
 }
