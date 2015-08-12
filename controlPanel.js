@@ -91,16 +91,6 @@ function generateModulePanel(moduleData) {
 	// Content variables
 	var moduleNum = moduleData.key();
 	var moduleName = moduleData.val().location;
-	var buttonText = [];
-	var buttonValue = [];
-
-	// Fill buttonText and buttonValue arrays
-	var counter = 0;
-	moduleData.val().relays.forEach(function(curModule) {
-		buttonText[counter] = curModule.name;
-		buttonValue[counter] = curModule.value;
-		counter++;
-	});
 
 	// Generate panel body 
 	var panelBody = generatePanelStructure("Module " + moduleNum + ": " + moduleName);
@@ -111,17 +101,19 @@ function generateModulePanel(moduleData) {
 	panelBody.appendChild(buttonToolbar);
 
 	// Create buttons
-	for (var i = 0; i < buttonText.length; i++) {
+	var i = 0;
+	moduleData.val().relays.forEach(function(curModule) {
 		var button = document.createElement("button");
-		var buttonTextElement = document.createTextNode(buttonText[i]);
+		var buttonTextElement = document.createTextNode(curModule.name);
 		button.type = "button";
 		button.style.margin = "2px";
-		button.className = chooseButtonColor(buttonValue[i]);
+		button.className = chooseButtonColor(curModule.value);
 		button.id = "module" + moduleNum + "button" + String(i + 1);
 		button.addEventListener("click", function() { toggleRelay(moduleNum, i + 1); });
 		button.appendChild(buttonTextElement);
 		buttonToolbar.appendChild(button);
-	}
+		i++;
+	});
 }
 
 function toggleRelay(moduleNum, buttonNum) {
