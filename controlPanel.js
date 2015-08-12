@@ -1,24 +1,28 @@
 var ref             = new Firebase('https://connormason.firebaseio.com');
 var automationRef   = ref.child("homeAutomation");
+var relayModulesRef = automationRef.child("relayModules");
+var modesRef 		= automationRef.child("modes");
 
 // ********************** Make values reload when database updated ************
 
 function loadData() {
 	// Load modes and generate panel
-	automationRef.child("modes").once("value", function(modesSnapshot) {
+	modesRef.once("value", function(modesSnapshot) {
 		// Check to make sure modes reference exists
 		if (modesSnapshot.val() === null) {
 			console.log("modes reference does not exist");
+			return;
 		}
 
 		generateModesPanel(modesSnapshot)
 	});
 
 	// Load modules and generate panels for each
-	automationRef.child("relayModules").once("value", function(modulesSnapshot) {
+	relayModulesRef.once("value", function(modulesSnapshot) {
 		// Check to make sure relayModules reference exists
 		if (modulesSnapshot.val() === null) {
 			console.log("relayModules reference does not exist");
+			return;
 		}
 
 		// Loop through all relay modules and create panels
@@ -28,12 +32,32 @@ function loadData() {
 	});
 }
 
+function isInArray(value, array) {
+	if (array === null) {
+		return false;
+	}
+
+	return array.indexOf(value) > -1;
+}
+
 function chooseButtonColor(value) {
 	if (!value) {
 		return "btn btn-lg btn-danger"
 	} else {
 		return "btn btn-lg btn-success"
 	}
+}
+
+function displaySelectedListItem(modeSelected) {
+	var listItems = document.getElementById("modesList").getElementsByTagName("a");
+
+	// Clear all selected items
+	for (var i = 0; i < listItems.length; i++) {
+		listItems[i].className = "list-group-item"; 
+	}
+
+	// Highlight selected mode
+	modeSelected.className = "list-group-item active";
 }
 
 function generatePanelStructure(panelTitleIn) {
@@ -74,16 +98,21 @@ function generateModesPanel(modesSnapshot) {
 	// Create list group
 	var listGroup = document.createElement("div");
 	listGroup.className = "list-group";
+	listGroup.id = "modesList";
 	panelBody.appendChild(listGroup);
 
 	// Create list items
+	var counter = 1;
 	modesSnapshot.forEach(function(mode) {
 		var listItem = document.createElement("a");
 		var listItemText = document.createTextNode(mode.val().name);
 		listItem.className = "list-group-item";
-		listItem.addEventListener("click", function() { selectMode(); })
+		listItem.id = "mode" + counter; 
+		listItem.name = mode.val().name;
+		listItem.addEventListener("click", function() { selectMode(listItem.id); })
 		listItem.appendChild(listItemText);
 		listGroup.appendChild(listItem);
+		counter++;
 	});
 }
 
@@ -120,10 +149,11 @@ function generateModulePanel(moduleData) {
 }
 
 function toggleRelay(moduleNum, buttonNum) {
-	automationRef.child("relayModules").once("value", function(modulesSnapshot) {
+	relayModulesRef.once("value", function(modulesSnapshot) {
 		// Check to make sure relayModules reference exists
 		if (modulesSnapshot.val() === null) {
 			console.log("relayModules reference does not exist");
+			return;
 		}
 
 		// Get relay value and toggle
@@ -136,6 +166,77 @@ function toggleRelay(moduleNum, buttonNum) {
 	});
 }
 
-function selectMode() {
+function setRelay(moduleNum, buttonNum, boolValue) {
+	relayModulesRef.once("value", function(modulesSnapshot) {
+		// Check to make sure relayModules reference exists
+		if (modulesSnapshot.val() === null) {
+			console.log("relayModules reference does not exist");
+			return;
+		}
 
+		// Get relay value and toggle
+		var curButton = modulesSnapshot.val()[moduleNum].relays[buttonNum];
+		automationRef.child("relayModules").child(moduleNum).child("relays").child(buttonNum).update({value: boolValue});
+
+		// Update button color
+		document.getElementById("module" + moduleNum + "button" + buttonNum).className = chooseButtonColor(boolValue);
+	});
+}
+
+function selectMode(modeID) {
+	// Get reference to list item selected
+	var modeSelected = document.getElementById(modeID);
+
+	// Pull list of modes
+	modesRef.once("value", function(modesSnapshot) {
+		// Check to make sure modes reference exists
+		if (modesSnapshot.val() === null) {
+			console.log("modes reference does not exist");
+			return;
+		}
+
+		// Search for selected mode
+		var found = false;
+		modesSnapshot.forEach(function(mode) {
+			if (mode.key() === modeSelected.name) {
+				// If selected mode found, pull "on" devices data
+				modesRef.child(modeSelected.name).child("devices").once("value", function(devicesSnapshot) {
+					// Then pull relayModules
+					relayModulesRef.once("value", function(modulesSnapshot) {
+						// Check to make sure relayModules reference exists
+						if (modulesSnapshot.val() === null) {
+							console.log("relayModules reference does not exist");
+							return;
+						}
+
+						// Loop through all relay modules
+						modulesSnapshot.forEach(function(module) {
+							// Loop through all relays
+							var index = 0;
+							module.val().relays.forEach(function(relay) {
+								// Turn device on if in mode devices, off otherwise
+								if (isInArray(relay.name, devicesSnapshot.val())) {
+									setRelay(module.key(), index + 1, true);
+								} else {
+									setRelay(module.key(), index + 1, false);
+								}
+								index++;
+							});
+						});
+					});
+				});
+
+				found = true;
+			} 
+		});
+
+		// Fallback if for some reason mode is not found in database
+		if (!found) {
+			console.log("selected mode not found in database");
+			return;
+		}
+	});
+
+	// Update interface to show list item as selected
+	displaySelectedListItem(modeSelected);
 }
