@@ -4,7 +4,17 @@ var automationRef   = ref.child("homeAutomation");
 // ********************** Make values reload when database updated ************
 
 function loadData() {
-	// Load modules
+	// Load modes and generate panel
+	automationRef.child("modes").once("value", function(modesSnapshot) {
+		// Check to make sure modes reference exists
+		if (modesSnapshot.val() === null) {
+			console.log("modes reference does not exist");
+		}
+
+		generateModesPanel(modesSnapshot)
+	});
+
+	// Load modules and generate panels for each
 	automationRef.child("relayModules").once("value", function(modulesSnapshot) {
 		// Check to make sure relayModules reference exists
 		if (modulesSnapshot.val() === null) {
@@ -13,7 +23,7 @@ function loadData() {
 
 		// Loop through all relay modules and create panels
 		modulesSnapshot.forEach(function(module) {
-			createModule(module);
+			generateModulePanel(module);
 		});
 	});
 }
@@ -26,7 +36,7 @@ function chooseButtonColor(value) {
 	}
 }
 
-function generatePanel(panelTitleIn) {
+function generatePanelStructure(panelTitleIn) {
 	// Create col-md-4 div
 	var colElement = document.createElement("div");
 	colElement.className = "col-md-4";
@@ -57,17 +67,42 @@ function generatePanel(panelTitleIn) {
 	return panelBody;
 }
 
-function createModule(moduleData) {
+function generateModesPanel(modes) {
+	// Content variables
+	var modeName = modes.val().name;
+
+	// Generate panel body 
+	var panelBody = generatePanelStructure("Module " + moduleNum + ": " + moduleName);
+
+	// Create list group
+	var listGroup = document.createElement("div");
+	listGroup.className = "list-group";
+	panelBody.appendChild(listGroup);
+
+	// Create list items
+	modes.forEach(function(mode) {
+		var listItem = document.createElement("a");
+		var listItemText = document.createTextNode();
+	});
+}
+
+function generateModulePanel(moduleData) {
 	// Content variables
 	var moduleNum = moduleData.key();
 	var moduleName = moduleData.val().location;
-	var buttonText = [moduleData.val().relays[1].name, moduleData.val().relays[2].name, 
-					moduleData.val().relays[3].name, moduleData.val().relays[4].name];
-	var buttonValue = [moduleData.val().relays[1].value, moduleData.val().relays[2].value, 
-					moduleData.val().relays[3].value, moduleData.val().relays[4].value];
+	var buttonText = [];
+	var buttonValue = [];
 
-	// Generate module panel 
-	var panelBody = generatePanel("Module " + moduleNum + ": " + moduleName);
+	// Fill buttonText and buttonValue arrays
+	var counter = 0;
+	moduleData.val().relays.forEach(function(curModule) {
+		buttonText[counter] = curModule.name;
+		buttonValue[counter] = curModule.value;
+		counter++;
+	});
+
+	// Generate panel body 
+	var panelBody = generatePanelStructure("Module " + moduleNum + ": " + moduleName);
 
 	// Create button toolbar
 	var buttonToolbar = document.createElement("div");
@@ -75,7 +110,7 @@ function createModule(moduleData) {
 	panelBody.appendChild(buttonToolbar);
 
 	// Create buttons
-	for (var i = 0; i < 4; i++) {
+	for (var i = 0; i < buttonText.length; i++) {
 		var button = document.createElement("button");
 		var buttonTextElement = document.createTextNode(buttonText[i]);
 		button.type = "button";
