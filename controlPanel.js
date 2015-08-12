@@ -101,19 +101,22 @@ function generateModulePanel(moduleData) {
 	panelBody.appendChild(buttonToolbar);
 
 	// Create buttons
-	var i = 0;
+	counter = 0;
 	moduleData.val().relays.forEach(function(curModule) {
+		var curCounter = counter + 1;
+
 		var button = document.createElement("button");
 		var buttonTextElement = document.createTextNode(curModule.name);
 		button.type = "button";
 		button.style.margin = "2px";
 		button.className = chooseButtonColor(curModule.value);
-		button.id = "module" + moduleNum + "button" + String(i + 1);
-		button.addEventListener("click", function() { toggleRelay(moduleNum, i + 1); });
+		button.id = "module" + moduleNum + "button" + String(curCounter);
+		button.addEventListener("click", function() { toggleRelay(moduleNum, curCounter); });
 		button.appendChild(buttonTextElement);
 		buttonToolbar.appendChild(button);
-		i++;
+		counter++;
 	});
+
 }
 
 function toggleRelay(moduleNum, buttonNum) {
