@@ -34,30 +34,13 @@
     <![endif]-->
   </head>
 
-  <body role="document">
+  <body role="document" onload="loadData()">
     <div id="controlContainer" class="container theme-showcase" role="main">
 
       <!-- Main jumbotron for a primary marketing message or call to action -->
       <div class="jumbotron">
-        <h1>Home Automation Control Panel</h1>
+        <h1>Automation Control Panel</h1>
       </div>
-
-      <div class="col-md-4">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">Module 1: Desk</h3>
-          </div>
-          <div class="panel-body">
-            <div class="btn-toolbar">
-              <button type="button" style="margin: 2px" class="btn btn-lg btn-danger">Desk Lamp</button>
-              <button type="button" style="margin: 2px" class="btn btn-lg btn-danger">Rope Light</button>
-              <button type="button" style="margin: 2px" class="btn btn-lg btn-success">Monitor 1</button>
-              <button type="button" style="margin: 2px" onclick="createNewElement()" class="btn btn-lg btn-success">Monitor 2</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> <!-- /container -->
 
     <!-- JavaScript Functions -->
     <script type='text/javascript' src="controlPanel.js"></script>
