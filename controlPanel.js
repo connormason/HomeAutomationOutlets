@@ -223,11 +223,16 @@ function selectMode(modeID) {
 								index++;
 							});
 						});
+
+						// Set mode as active
+						modesRef.child(modeSelected.name).update({active: true});
 					});
 				});
-
 				found = true;
-			} 
+			} else {
+				// Set mode to inactive
+				modesRef.child(mode.key()).update({active: false});
+			}
 		});
 
 		// Fallback if for some reason mode is not found in database
