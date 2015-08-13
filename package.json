@@ -1,0 +1,10 @@
+{
+    "name": "HomeAutomationOutlets",
+    "description": "A suite of code to automate my room inexpensively and easily",
+    "version": "0.0.1",
+    "dependencies": {
+        "firebase": "*",
+        "serialport": "*",
+        "colors": "*"
+    }
+}
