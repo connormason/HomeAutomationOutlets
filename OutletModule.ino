@@ -26,7 +26,6 @@ Digital:
 13 --> RF SCK
 */
 
-#include <EEPROM.h>
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
@@ -45,14 +44,11 @@ Digital:
 #define RELAY_SEVEN 16
 #define RELAY_EIGHT 17
 
-#define MODULE_NUM_ADDR 0
-
+const int RELAY_MODULE = 0x01;
+const uint64_t pipe = 0xE8E8F0F0E1LL;
 bool invertRelays = false;
 
-const uint64_t pipe = 0xE8E8F0F0E1LL;
-
 int data[4];
-int moduleNum = 0;
 int curRelays = 0;
 
 RF24 radio(CE_PIN, CSN_PIN);
@@ -109,21 +105,22 @@ void setup() {
 }
 
 void loop() {
-	// Read values sent over RF
-	while (radio.available()) {
-		radio.read(data, sizeof(data));
+	// Wait for signal to be received
+	if (radio.available()) {
 		blinkActivity();
-		if (data[1] == moduleNum) {
-			if (data[3] != 0) {
-				EEPROM.update(MODULE_NUM_ADDR, data[4]);
-			} else {
-				curRelays = data[2];
-			}
+
+		// Dump payloads until all data has been received
+		bool done = false;
+		while (!done) {
+			done = radio.read(data, sizeof(data));
 		}
 	}
 
-	// Set relays according to values
-	setRelays();
+	// If correct signal type, set relays
+	if ((data[0] == 0) && (data[1] == RELAY_MODULE)) {
+		curRelays = data[2];
+		setRelays();
+	}
 
 	// Send response?
 }

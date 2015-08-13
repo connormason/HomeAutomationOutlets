@@ -8,11 +8,16 @@ var verbose = true;
 // Firebase references
 var ref             = new Firebase('https://connormason.firebaseio.com');
 var automationRef   = ref.child("homeAutomation");
+var modesRef        = automationRef.child("modes");
 var relayModulesRef = automationRef.child("relayModules");
 
 // ********************* Functions *********************
 function sendRelayData(module, data) {
     if (verbose) { console.log(colors.green("Sending updated relay info for module " + module + " to Arduino...")); }
+}
+
+function sendModeData(data) {
+    
 }
 // ********************* /Functions ********************
 
@@ -31,3 +36,6 @@ relayModulesRef.on("child_changed", function(modulesSnapshot) {
 });
 
 // If mode values change, act accordingly
+modesRef.on("child_changed", function(modesSnapshot) {
+    if (verbose) { console.log("modes child changed"); }
+});

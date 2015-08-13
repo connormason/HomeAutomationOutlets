@@ -167,22 +167,9 @@ function toggleRelay(moduleNum, buttonNum) {
 	});
 }
 
-function setRelay(moduleNum, buttonNum, boolValue) {
-	relayModulesRef.once("value", function(modulesSnapshot) {
-
-		// Check to make sure relayModules reference exists
-		if (modulesSnapshot.val() === null) {
-			console.log("relayModules reference does not exist");
-			return;
-		}
-
-		// Get relay value and toggle
-		var curButton = modulesSnapshot.val()[moduleNum].relays[buttonNum];
-		automationRef.child("relayModules").child(moduleNum).child("relays").child(buttonNum).update({value: boolValue});
-
-		// Update button color
-		document.getElementById("module" + moduleNum + "button" + buttonNum).className = chooseButtonColor(boolValue);
-	});
+// Update button color based on value
+function setButtonColor(moduleNum, buttonNum, boolValue) {
+	document.getElementById("module" + moduleNum + "button" + buttonNum).className = chooseButtonColor(boolValue);
 }
 
 function selectMode(modeID) {
@@ -191,6 +178,7 @@ function selectMode(modeID) {
 
 	// Pull list of modes
 	modesRef.once("value", function(modesSnapshot) {
+		var modesData = modesSnapshot.val();
 
 		// Check to make sure modes reference exists
 		if (modesSnapshot.val() === null) {
@@ -218,31 +206,38 @@ function selectMode(modeID) {
 
 						// Loop through all relay modules
 						modulesSnapshot.forEach(function(module) {
+							var moduleData = module.val();
 
 							// Loop through all relays
 							var index = 0;
 							module.val().relays.forEach(function(relay) {
-								
+
 								// Turn device on if in mode devices, off otherwise
 								if (isInArray(relay.name, devicesSnapshot.val())) {
-									setRelay(module.key(), index + 1, true);
+									moduleData.relays[index + 1].value = true;
+									setButtonColor(module.key(), index + 1, true);
 								} else {
-									setRelay(module.key(), index + 1, false);
+									moduleData.relays[index + 1].value = false;
+									setButtonColor(module.key(), index + 1, false);
 								}
 								index++;
 							});
+							module.ref().set(moduleData);
 						});
 
 						// Set mode as active
-						modesRef.child(modeSelected.name).update({active: true});
+						modesData[modeSelected.name].active = true;
+						// modesSnapshot.ref().set(modesData);
 					});
 				});
 				found = true;
 			} else {
 				// Set mode to inactive
-				modesRef.child(mode.key()).update({active: false});
+				modesData[mode.key()].active = false;
+				// modesSnapshot.ref().set(modesData);
 			}
 		});
+		modesSnapshot.ref().set(modesData);
 
 		// Fallback if for some reason mode is not found in database
 		if (!found) {
