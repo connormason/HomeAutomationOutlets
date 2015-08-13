@@ -150,6 +150,7 @@ function generateModulePanel(moduleData) {
 
 function toggleRelay(moduleNum, buttonNum) {
 	relayModulesRef.once("value", function(modulesSnapshot) {
+
 		// Check to make sure relayModules reference exists
 		if (modulesSnapshot.val() === null) {
 			console.log("relayModules reference does not exist");
@@ -168,6 +169,7 @@ function toggleRelay(moduleNum, buttonNum) {
 
 function setRelay(moduleNum, buttonNum, boolValue) {
 	relayModulesRef.once("value", function(modulesSnapshot) {
+
 		// Check to make sure relayModules reference exists
 		if (modulesSnapshot.val() === null) {
 			console.log("relayModules reference does not exist");
@@ -189,6 +191,7 @@ function selectMode(modeID) {
 
 	// Pull list of modes
 	modesRef.once("value", function(modesSnapshot) {
+
 		// Check to make sure modes reference exists
 		if (modesSnapshot.val() === null) {
 			console.log("modes reference does not exist");
@@ -198,11 +201,15 @@ function selectMode(modeID) {
 		// Search for selected mode
 		var found = false;
 		modesSnapshot.forEach(function(mode) {
+
 			if (mode.key() === modeSelected.name) {
+
 				// If selected mode found, pull "on" devices data
 				modesRef.child(modeSelected.name).child("devices").once("value", function(devicesSnapshot) {
+
 					// Then pull relayModules
 					relayModulesRef.once("value", function(modulesSnapshot) {
+
 						// Check to make sure relayModules reference exists
 						if (modulesSnapshot.val() === null) {
 							console.log("relayModules reference does not exist");
@@ -211,9 +218,11 @@ function selectMode(modeID) {
 
 						// Loop through all relay modules
 						modulesSnapshot.forEach(function(module) {
+
 							// Loop through all relays
 							var index = 0;
 							module.val().relays.forEach(function(relay) {
+								
 								// Turn device on if in mode devices, off otherwise
 								if (isInArray(relay.name, devicesSnapshot.val())) {
 									setRelay(module.key(), index + 1, true);
