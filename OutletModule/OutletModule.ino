@@ -90,10 +90,10 @@ void setup() {
 	pinMode(ACTIVITY_LED, OUTPUT);
 
 	// Read module number from EEPROM
-	moduleNum = EEPROM.read(MODULE_NUM_ADDR);
-	for (int i = 0; i < moduleNum; i++) {
-		blinkActivity();
-	}
+	// moduleNum = EEPROM.read(MODULE_NUM_ADDR);
+	// for (int i = 0; i < moduleNum; i++) {
+	// 	blinkActivity();
+	// }
 
 	// Start RF radio
 	radio.begin();
@@ -118,8 +118,13 @@ void loop() {
 
 	// If correct signal type, set relays
 	if ((data[0] == 0) && (data[1] == RELAY_MODULE)) {
-		curRelays = data[2];
-		setRelays();
+		// curRelays = data[2];
+		// setRelays();
+		if (data[2] == 0) {
+			digitalWrite(RELAY_ONE, LOW);
+		} else {
+			digitalWrite(RELAY_ONE, HIGH);
+		}
 	}
 
 	// Send response?
