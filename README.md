@@ -14,6 +14,8 @@ The parts needed to construct **four** seperate 4-outlet HomeAutomationOutlet bo
 |[Leviton 15 Amp Duplex Outlet](http://www.homedepot.com/p/Leviton-15-Amp-Duplex-Outlet-White-R52-05320-00W/202066670)|$0.68|8|$5.44|
 |[Raco 1-1/4 in. x 4 in. Deep Square Drawn Box with 1/2 in. Knockouts](http://www.homedepot.com/p/Raco-1-1-4-in-x-4-in-Deep-Square-Drawn-Box-with-1-2-in-Knockouts-50-Pack-185/203634382)|$0.99|4|$3.96|
 |[2 Gang Midway Duplex Outlet Nylon Wall Plate](http://www.homedepot.com/p/Leviton-2-Gang-Midway-Duplex-Outlet-Nylon-Wall-Plate-White-R52-0PJ82-00W/202059881)|$1.39|4|$5.56|
-|Various 16AWG wire|?|?|?|
-|Various jumper cables|?|?|?|
+|Various 16AWG wire||||
+|Various jumper cables||||
+|**Total Cost**|||**$118.85**|
+|**Cost Per Module**|||**$29.71**|
 
